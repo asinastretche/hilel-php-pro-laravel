@@ -1,13 +1,14 @@
 @extends('layouts.admin')
-
 @section('content')
     <div class="container">
         <div class="row">
             <div class="col-12 d-flex align-items-center justify-content-center pt-5">
-                <form class="card w-75" method="POST" enctype="multipart/form-data" action="{{route('admin.products.store')}}">
+                <form class="card w-50" method="POST" enctype="multipart/form-data"
+                      action="{{route('admin.products.update', $product)}}">
+                    @method('PUT')
                     @csrf
 
-                    <h5 class="card-header">Create product</h5>
+                    <h5 class="card-header">Edit product</h5>
                     <div class="card-body">
                         <div class="row mb-3">
                             <label for="title" class="col-md-4 col-form-label text-md-end">{{ __('Title') }}</label>
@@ -15,7 +16,7 @@
                             <div class="col-md-6">
                                 <input id="title" type="text"
                                        class="form-control @error('title') is-invalid @enderror" name="title"
-                                       value="{{ old('title') }}" required autofocus>
+                                       value="{{ old('title') ?? $product->title }}" required autofocus>
 
                                 @error('title')
                                 <span class="invalid-feedback" role="alert">
@@ -31,7 +32,7 @@
                             <div class="col-md-6">
                                 <input id="SKU" type="text"
                                        class="form-control @error('SKU') is-invalid @enderror" name="SKU"
-                                       value="{{ old('SKU') }}" required>
+                                       value="{{ old('SKU') ?? $product->SKU }}" required>
 
                                 @error('SKU')
                                 <span class="invalid-feedback" role="alert">
@@ -48,7 +49,7 @@
                             <div class="col-md-6">
                                     <textarea id="description" type="text"
                                               class="form-control" name="description"
-                                    >{{ old('description') }}</textarea>
+                                    >{{ old('description') ?? $product->description }}</textarea>
                             </div>
                         </div>
 
@@ -60,7 +61,9 @@
                                 <select name="categories[]" id="categories"
                                         class="form-control @error('categories') is-invalid @enderror" multiple>
                                     @foreach($categories as $category)
-                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                        <option value="{{$category->id}}"
+                                                @if (in_array($category->id, $productCategories)) selected @endif
+                                        >{{$category->name}}</option>
                                     @endforeach
                                 </select>
 
@@ -78,7 +81,7 @@
                             <div class="col-md-6">
                                 <input id="price" type="number"
                                        class="form-control @error('price') is-invalid @enderror" name="price"
-                                       value="{{ old('price') }}"
+                                       value="{{ old('price') ?? $product->price }}"
                                        step="any"
                                        required>
 
@@ -97,7 +100,7 @@
                             <div class="col-md-6">
                                 <input id="discount" type="number"
                                        class="form-control @error('discount') is-invalid @enderror" name="discount"
-                                       value="{{ old('discount') }}"
+                                       value="{{ old('discount') ?? $product->discount }}"
                                        step="any"
                                        min="0"
                                        max="99"
@@ -118,7 +121,7 @@
                             <div class="col-md-6">
                                 <input id="quantity" type="number"
                                        class="form-control @error('quantity') is-invalid @enderror" name="quantity"
-                                       value="{{ old('quantity') ?? 1 }}">
+                                       value="{{ old('quantity') ?? $product->quantity }}">
 
                                 @error('quantity')
                                 <span class="invalid-feedback" role="alert">
@@ -133,7 +136,7 @@
                                    class="col-md-4 col-form-label text-md-end">{{ __('Thumbnail') }}</label>
 
                             <div class="col-md-12 mb-4 d-flex align-items-center justify-content-center">
-                                <img src="#" id="thumbnail-preview" style="width: 50%; display:none;" />
+                                <img src="{{$product->thumbnailUrl}}" id="thumbnail-preview" style="width: 50%;"/>
                             </div>
                             <div class="col-md-12">
                                 <input id="thumbnail" type="file"
@@ -152,11 +155,22 @@
                                    class="col-md-4 col-form-label text-md-end">{{ __('Additional Images') }}</label>
 
                             <div class="col-12 mb-4 d-flex align-items-center justify-content-center">
-                                <div id="images-wrapper" class="row"></div>
+                                <div id="images-wrapper" class="row">
+                                    @foreach($product->images as $image)
+                                        <div class='mb-4 col-md-6 images-wrapper-item'>
+                                            <button class="btn btn-danger images-wrapper-item-remove"
+                                                    data-url="{{route('ajax.images.remove', $image)}}">
+                                                <i class="fa-solid fa-minus"></i>
+                                            </button>
+                                            <img src='{{$image->url}}' style='width: 100%'/>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                             <div class="col-md-12">
-                                <input id="images" type="file"
-                                       class="form-control @error('images') is-invalid @enderror" name="images[]" multiple>
+                                <input id="edit-images" type="file"
+                                       class="form-control @error('images') is-invalid @enderror" name="images[]"
+                                       multiple>
 
                                 @error('images')
                                 <span class="invalid-feedback" role="alert">
@@ -168,10 +182,17 @@
 
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-end">
-                        <button type="submit" class="btn btn-outline-success">Create</button>
+                        <button type="submit" class="btn btn-outline-success">Update</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 @endsection
+
+@push('footer-js')
+    @vite([
+    'resources/js/admin/products.js',
+    'resources/js/admin/image-actions.js'
+    ])
+@endpush
