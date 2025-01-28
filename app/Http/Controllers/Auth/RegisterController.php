@@ -62,12 +62,11 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         $user = User::create(
-            $this->validator($data)->validate()
+            $this->validator($data)->validated()
         );
 
         $user->assignRole(RoleEnum::CUSTOMER->value);
 
         return $user;
     }
-
 }
