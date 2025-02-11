@@ -41,6 +41,8 @@ class ProductsController extends Controller
      */
     public function store(CreateRequest $request, ProductsRepositoryContract $repository)
     {
+        ds($request->validated());
+
         if ($product = $repository->store($request)) {
             notify()->success("Product [$product->title] was created");
 
