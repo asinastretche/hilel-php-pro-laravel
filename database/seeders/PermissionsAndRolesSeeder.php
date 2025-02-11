@@ -12,7 +12,7 @@ use App\Enums\RoleEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-class PermisssionsAndRolesSeeder extends Seeder
+class PermissionsAndRolesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
