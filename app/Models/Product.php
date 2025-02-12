@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Observers\ProductObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Services\Contracts\FileServiceContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -18,7 +19,14 @@ use Illuminate\Support\Str;
 class Product extends Model
 {
     use HasFactory;
+
     protected $guarded = [];
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
@@ -34,20 +42,24 @@ class Product extends Model
             return Storage::url($this->attributes['thumbnail']);
         });
     }
-
     public function setThumbnailAttribute(UploadedFile $file): void
     {
         if (!empty($this->attributes['thumbnail'])) {
             Storage::delete($this->attributes['thumbnail']);
         }
 
-        $fileName = Str::slug(microtime());
-        $filePath = 'products/' . $this->attributes['slug'] . "/$fileName" . $file->getClientOriginalName();
+        $filePath = 'products/' . $this->attributes['slug'];
 
-        Storage::put($filePath, File::get($file));
-        Storage::setVisibility($filePath, 'public');
+//        Storage::put($filePath, File::get($file));
+//        Storage::setVisibility($filePath, 'public');
 
-        $this->attributes['thumbnail'] = $filePath;
+        $this->attributes['thumbnail'] = app(FileServiceContract::class)
+            ->upload($file, $filePath);
+    }
+
+    public function finalPrice(): Attribute
+    {
+        return Attribute::get(fn () => $this->attributes['price'] - ($this->attributes['discount'] / 100));
     }
 
     public function imagesFolderPath(): string
