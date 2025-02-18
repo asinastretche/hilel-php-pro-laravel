@@ -15,6 +15,7 @@
         "bluemmb/faker-picsum-photos-provider": "^2.0",
         "itsgoingd/clockwork": "*",
         "laravel/framework": "^11.31",
+        "laravel/horizon": "^5.30",
         "laravel/telescope": "^5.3",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
