@@ -1,7 +1,5 @@
 <?php
-
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Gross price as base price
@@ -12,7 +10,7 @@ return [
     |
     */
 
-    'calculator' => \Gloudemans\Shoppingcart\Calculation\DefaultCalculator::class,
+    'calculator' => \App\Services\CartCalculator::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -23,9 +21,7 @@ return [
     | Taxable interface and use the HasTax trait.
     |
     */
-
     'tax' => 5,
-
     /*
     |--------------------------------------------------------------------------
     | Shoppingcart database settings
@@ -35,15 +31,10 @@ return [
     | storing and restoring a cart.
     |
     */
-
     'database' => [
-
         'connection' => null,
-
         'table' => 'cart',
-
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Destroy the cart on user logout
@@ -53,9 +44,7 @@ return [
     | destroy all cart instances when the user logs out.
     |
     */
-
     'destroy_on_logout' => false,
-
     /*
     |--------------------------------------------------------------------------
     | Default number format
@@ -68,12 +57,10 @@ return [
 
     'format' => [
 
-        'decimals' => 2,
+        'decimals' => 3,
 
         'decimal_point' => '.',
 
         'thousand_separator' => ',',
-
     ],
-
 ];
