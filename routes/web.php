@@ -57,4 +57,7 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
         Route::post('order', [PayPalController::class, 'create'])->name('order.create');
         Route::post('order/{vendorOrderId}/capture', [PayPalController::class, 'capture'])->name('order.capture');
     });
+
+    Route::post('stripe/order', [StripeController::class, 'create'])->name('stripe.order.create');
+
 });
