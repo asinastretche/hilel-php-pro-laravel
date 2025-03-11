@@ -31,23 +31,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a href="{{route('products.index')}}" class="nav-link">Products</a></li>
-                    <li class="nav-item"><a href="{{route('categories.index')}}" class="nav-link">Categories</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('account.wishlist') }}">{{ __('Wish List') }}</a>
+                    </li>
                 </ul>
 
                 <!-- Right Side Of Navbar -->
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="{{ route('cart.index') }}">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                            <span
-                                id="cartCountBadge"
-                                style="font-size: 10px;"
-                                class="position-absolute top-20 start-90 translate-middle badge rounded-pill bg-info">
-                                {{Cart::instance('cart')->countItems()}}
-                              </span>
-                        </a>
-                    </li>
                     <!-- Authentication Links -->
                     @guest
                         @if (Route::has('login'))
@@ -68,11 +58,11 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @hasanyrole('admin|moderator')
-                                <a href="{{route('admin.dashboard')}}" class="dropdown-item">Admin panel</a>
+                                @hasanyrole('moderator|admin')
+                                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                                    Admin Panel
+                                </a>
                                 @endhasanyrole
-                                <a href="{{route('account.wishlist')}}" class="dropdown-item">Wish List</a>
-
                                 <a class="dropdown-item" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
