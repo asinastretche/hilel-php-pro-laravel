@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('content')
     <div class="container">
         <div class="row mt-5">
@@ -28,6 +29,7 @@
                         @each('categories.parts.label', $product->categories, 'category')
                     </div>
                 </div>
+
                 {{--                @auth()--}}
                 {{--                    <div class="row mt-5">--}}
                 {{--                        <div class="col-12">--}}
@@ -41,6 +43,7 @@
                 {{--                        </div>--}}
                 {{--                    </div>--}}
                 {{--                @endauth--}}
+
                 {{--                @if ($attributes)--}}
                 {{--                    <div class="row mt-5">--}}
                 {{--                        <div class="col-12 col-sm-6">{{ $attributeKey }}</div>--}}
@@ -48,6 +51,7 @@
                 {{--                            <div class="card">--}}
                 {{--                                <form method="GET" action="{{ route('products.show', $product) }}"--}}
                 {{--                                      class="card-body d-flex align-items-center justify-content-between">--}}
+
                 {{--                                    <table class="table table-striped-columns">--}}
                 {{--                                        <thead>--}}
                 {{--                                        <tr>--}}
@@ -83,14 +87,22 @@
                 {{--                    </div>--}}
                 {{--                @endif--}}
                 <div class="row mt-5">
-                    <div class="col-12 col-sm-6"></div>
+                    <div class="col-12 col-sm-6 d-flex align-items-center justify-content-end gap-2">
+                        @auth
+                            @include('products.parts.wishlist', ['productId' => $product->id, 'isFollowed' => $wishListInfo['price'], 'type' => 'price'])
+                            @unless($product->in_stock)
+                                @include('products.parts.wishlist', ['productId' => $product->id, 'isFollowed' => $wishListInfo['in_stock'], 'type' => 'in_stock'])
+                            @endunless
+                        @endauth
+                    </div>
                     <div class="col-12 col-sm-6">
                         <div class="card">
                             <form method="POST" action="{{ route('cart.add', $product) }}"
                                   class="card-body d-flex align-items-center justify-content-between">
                                 @csrf
                                 {{--                                <input type="hidden" name="option" value="{{$selectedOption}}" />--}}
-                                <div class="card-title">Price: <strong class="fs-5">{{ $product->finalPrice }} $</strong></div>
+                                <div class="card-title">Price: <strong class="fs-5">{{ $product->finalPrice }}
+                                        $</strong></div>
                                 <button type="submit" class="btn btn-outline-success">Buy</button>
                             </form>
                         </div>

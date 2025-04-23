@@ -3,21 +3,20 @@
 namespace App\Models;
 
 use App\Observers\ProductObserver;
+use App\Observers\WishListObserver;
+use App\Services\Contracts\FileServiceContract;
 use Gloudemans\Shoppingcart\CanBeBought;
 use Gloudemans\Shoppingcart\Contracts\Buyable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Services\Contracts\FileServiceContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
-#[ObservedBy([ProductObserver::class])]
+#[ObservedBy([ProductObserver::class, WishListObserver::class])]
 class Product extends Model implements Buyable
 {
     use HasFactory, CanBeBought;
@@ -33,6 +32,7 @@ class Product extends Model implements Buyable
     {
         return $this->morphMany(Image::class, 'imageable');
     }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
@@ -43,12 +43,24 @@ class Product extends Model implements Buyable
         return $this->belongsToMany(Order::class);
     }
 
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'wish_list', 'product_id', 'user_id');
+    }
+
+    public function inStock(): Attribute
+    {
+        return Attribute::get(fn () => $this->attributes['quantity'] > 0);
+    }
+
+    // $product->thumbnailUrl
     public function thumbnailUrl(): Attribute
     {
         return Attribute::get(function () {
             return Storage::url($this->attributes['thumbnail']);
         });
     }
+
     public function setThumbnailAttribute(UploadedFile $file): void
     {
         if (!empty($this->attributes['thumbnail'])) {
@@ -56,9 +68,6 @@ class Product extends Model implements Buyable
         }
 
         $filePath = 'products/' . $this->attributes['slug'];
-
-//        Storage::put($filePath, File::get($file));
-//        Storage::setVisibility($filePath, 'public');
 
         $this->attributes['thumbnail'] = app(FileServiceContract::class)
             ->upload($file, $filePath);
